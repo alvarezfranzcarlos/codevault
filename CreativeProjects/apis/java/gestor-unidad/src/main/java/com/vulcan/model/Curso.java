@@ -13,6 +13,10 @@ public class Curso {
     private String nombre;
     private int cupoMaximo;
 
+    // Constructor vacío
+    public Curso() {
+    }
+
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alumno> alumnos = new ArrayList<>();
 
