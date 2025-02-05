@@ -21,3 +21,11 @@ Clone the repository and explore the folders to find examples and starter code f
 
 ```bash
 git clone https://github.com/alvarezfranzcarlos/codevault.git
+
+
+mvn io.quarkus:quarkus-maven-plugin:3.0.0.Final:create \
+  -DprojectGroupId=com.vulcan \
+  -DprojectArtifactId=backend-test \
+  -DclassName="com.vulcan.GreetingResource" \
+  -Dpath="/api"
+  
