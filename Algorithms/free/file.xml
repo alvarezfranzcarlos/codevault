@@ -1,0 +1,214 @@
+<database name="YME_DB" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!-- ================= ORGANIZACIONES ================= -->
+  <table name="organizations">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- Identificador único de la organización. Ej: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' -->
+
+    <column name="name" type="VARCHAR"/>
+    <!-- Razón social. Ej: 'Empresa Minera S.A.', 'AgroBol Ltda.' -->
+
+    <column name="nit" type="VARCHAR" unique="true"/>
+    <!-- Número de Identificación Tributaria. Ej: '1234567011', '834002589' -->
+
+    <column name="industry_type" type="VARCHAR"/>
+    <!-- Rubro de la empresa. Ej: 'minería', 'agricultura' -->
+
+    <column name="status" type="VARCHAR"/>
+    <!-- Estado de la cuenta. Ej: 'activo', 'pendiente' -->
+  </table>
+
+  <!-- ================= USUARIOS ================= -->
+  <table name="users">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID único del usuario. Ej: 'eb22c19d-6fa4-4913-99d2-0fd0a5b2a801' -->
+
+    <column name="organization_id" type="UUID"/>
+    <!-- FK a organizations.id. Ej: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' -->
+
+    <column name="username" type="VARCHAR"/>
+    <!-- Alias de acceso. Ej: 'jlopez', 'operador_01' -->
+
+    <column name="email" type="VARCHAR" unique="true"/>
+    <!-- Correo del usuario. Ej: 'juan@empresa.com', 'admin@org.bo' -->
+
+    <column name="password_hash" type="VARCHAR"/>
+    <!-- Contraseña hasheada (BCrypt). Ej: '$2a$10$...', '$2y$12$...' -->
+
+    <column name="role" type="VARCHAR"/>
+    <!-- Rol asignado. Ej: 'ADMIN', 'BACKOFFICE' -->
+
+    <column name="status" type="VARCHAR"/>
+    <!-- Estado del usuario. Ej: 'activo', 'bloqueado' -->
+
+    <foreign-key column="organization_id" references="organizations(id)"/>
+  </table>
+
+  <!-- ================= MONEDAS ================= -->
+  <table name="currencies">
+    <column name="code" type="VARCHAR(3)" primaryKey="true"/>
+    <!-- Código ISO. Ej: 'USD', 'BOB' -->
+
+    <column name="name" type="VARCHAR"/>
+    <!-- Nombre de la moneda. Ej: 'Dólar estadounidense', 'Boliviano' -->
+  </table>
+
+  <!-- ================= SUCURSALES / SEDE ================= -->
+  <table name="branches">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID único de la sucursal. Ej: '8d7b0402-2b41-4007-901b-e9f861f0d9cb' -->
+
+    <column name="country" type="VARCHAR"/>
+    <!-- País de la sede. Ej: 'Bolivia', 'Bermudas' -->
+
+    <column name="name" type="VARCHAR"/>
+    <!-- Nombre referencial. Ej: 'BlockFinity Bolivia', 'BlockFinity Intl.' -->
+  </table>
+
+  <!-- ================= CUENTAS ================= -->
+  <table name="accounts">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID único de la cuenta. Ej: '6d3d6a1a-bf0b-11ec-9d64-0242ac120002' -->
+
+    <column name="organization_id" type="UUID"/>
+    <!-- FK a organización. Ej: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' -->
+
+    <column name="account_number" type="VARCHAR"/>
+    <!-- Número de cuenta bancaria. Ej: '001-12345678-01', 'IBAN-GB29NWBK60161331926819' -->
+
+    <column name="currency_code" type="VARCHAR(3)"/>
+    <!-- Moneda. Ej: 'USD', 'BOB' -->
+
+    <column name="bank_name" type="VARCHAR"/>
+    <!-- Banco asociado. Ej: 'Banco Unión', 'HSBC' -->
+
+    <column name="account_type" type="VARCHAR"/>
+    <!-- Tipo de cuenta. Ej: 'BANK', 'WALLET' -->
+
+    <column name="branch_id" type="UUID"/>
+    <!-- FK a branches.id. Ej: '8d7b0402-2b41-4007-901b-e9f861f0d9cb' -->
+
+    <foreign-key column="organization_id" references="organizations(id)"/>
+    <foreign-key column="currency_code" references="currencies(code)"/>
+  </table>
+
+  <!-- ================= WALLETS ================= -->
+  <table name="wallets">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID único de la wallet. Ej: 'b66c13e4-e39b-4f21-aafe-1091b0193085' -->
+
+    <column name="account_id" type="UUID"/>
+    <!-- FK a accounts.id. Ej: '6d3d6a1a-bf0b-11ec-9d64-0242ac120002' -->
+
+    <column name="wallet_address" type="VARCHAR"/>
+    <!-- Dirección cripto. Ej: '0x1234abcd5678ef...', '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy' -->
+
+    <column name="platform" type="VARCHAR"/>
+    <!-- Plataforma asociada. Ej: 'KRAKEN', 'METAMASK' -->
+
+    <foreign-key column="account_id" references="accounts(id)"/>
+  </table>
+
+  <!-- ================= ÓRDENES ================= -->
+  <table name="orders">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID de orden. Ej: 'f60debea-1a23-403b-8aaf-22173f340771' -->
+
+    <column name="type" type="VARCHAR"/>
+    <!-- Tipo de orden. Ej: 'ON_RAMP', 'OFF_RAMP' -->
+
+    <column name="status" type="VARCHAR"/>
+    <!-- Estado actual. Ej: 'pendiente', 'completado' -->
+
+    <column name="user_id" type="UUID"/>
+    <!-- Creador. Ej: 'eb22c19d-6fa4-4913-99d2-0fd0a5b2a801' -->
+
+    <column name="organization_id" type="UUID"/>
+    <!-- Organización. Ej: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' -->
+
+    <column name="amount" type="NUMERIC(18,6)"/>
+    <!-- Monto origen. Ej: '50000.00', '15320.75' -->
+
+    <column name="currency_origin" type="VARCHAR(3)"/>
+    <!-- Ej: 'USD', 'BOB' -->
+
+    <column name="currency_destination" type="VARCHAR(3)"/>
+    <!-- Ej: 'BOB', 'USD' -->
+
+    <column name="commission_percent" type="NUMERIC(5,2)"/>
+    <!-- Comisión en %. Ej: '1.5', '2.75' -->
+
+    <column name="commission_amount" type="NUMERIC(18,6)"/>
+    <!-- Comisión en monto. Ej: '750.00', '402.00' -->
+
+    <column name="exchange_rate" type="NUMERIC(18,6)"/>
+    <!-- Tasa aplicada. Ej: '6.96', '7.03' -->
+
+    <column name="execution_channel" type="VARCHAR"/>
+    <!-- Medio de ejecución. Ej: 'KRAKEN', 'MANUAL' -->
+
+    <column name="reference_code" type="VARCHAR"/>
+    <!-- Código externo. Ej: 'TRX0001234', 'ORD-88999' -->
+
+    <column name="created_at" type="TIMESTAMP"/>
+    <column name="updated_at" type="TIMESTAMP"/>
+
+    <foreign-key column="user_id" references="users(id)"/>
+    <foreign-key column="organization_id" references="organizations(id)"/>
+  </table>
+
+  <!-- ================= ESTADOS HISTÓRICOS ================= -->
+  <table name="order_status_log">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID único. Ej: 'a34b51fc-9c77-489c-a792-133734bcd1a2' -->
+
+    <column name="order_id" type="UUID"/>
+    <!-- Orden relacionada. Ej: 'f60debea-1a23-403b-8aaf-22173f340771' -->
+
+    <column name="from_status" type="VARCHAR"/>
+    <!-- De. Ej: 'pendiente' -->
+
+    <column name="to_status" type="VARCHAR"/>
+    <!-- A. Ej: 'aprobado' -->
+
+    <column name="reason" type="TEXT"/>
+    <!-- Motivo. Ej: 'Validación manual', 'Error en datos' -->
+
+    <column name="changed_by_user_id" type="UUID"/>
+    <!-- Usuario que cambió. Ej: 'eb22c19d-6fa4-4913-99d2-0fd0a5b2a801' -->
+
+    <column name="timestamp" type="TIMESTAMP"/>
+    <foreign-key column="order_id" references="orders(id)"/>
+    <foreign-key column="changed_by_user_id" references="users(id)"/>
+  </table>
+
+  <!-- ================= TRANSACTIONS ================= -->
+  <table name="transacciones">
+    <column name="id" type="UUID" primaryKey="true"/>
+    <!-- ID ejecución. Ej: '7e0d0fd2-29b1-4f17-a760-3613a29b9315' -->
+
+    <column name="order_id" type="UUID"/>
+    <!-- FK orden. Ej: 'f60debea-1a23-403b-8aaf-22173f340771' -->
+
+    <column name="executed_amount" type="NUMERIC(18,6)"/>
+    <!-- Monto ejecutado. Ej: '49900.00', '30000.50' -->
+
+    <column name="executed_at" type="TIMESTAMP"/>
+    <!-- Fecha/hora ejecución. Ej: '2025-04-17 09:22:00' -->
+
+    <column name="execution_type" type="VARCHAR"/>
+    <!-- Medio. Ej: 'BANK_TRANSFER', 'KRAKEN_WITHDRAWAL' -->
+
+    <column name="destination_account" type="VARCHAR"/>
+    <!-- Cuenta destino. Ej: '001-456789', 'EU01HSBC8800111' -->
+
+    <column name="transaction_reference" type="VARCHAR"/>
+    <!-- Código de la transacción. Ej: 'SW1234567', 'KRK-998877' -->
+
+    <column name="status" type="VARCHAR"/>
+    <!-- Estado. Ej: 'SUCCESS', 'FAILED' -->
+
+    <foreign-key column="order_id" references="orders(id)"/>
+  </table>
+
+</database>
